@@ -19,13 +19,22 @@ final class Db
         return $pdo;
     }
 
+    /** Add a column to a table created by an earlier version (SQLite has no IF NOT EXISTS for columns). */
+    public static function addColumn(\PDO $db, string $table, string $col, string $ddl): void
+    {
+        foreach ($db->query("PRAGMA table_info($table)") as $c) if ($c['name'] === $col) return;
+        $db->exec("ALTER TABLE $table ADD COLUMN $col $ddl");
+    }
+
     public static function migrate(\PDO $db): void
     {
         $db->exec(<<<'SQL'
 CREATE TABLE IF NOT EXISTS exam_sessions(
   id INTEGER PRIMARY KEY, code TEXT UNIQUE NOT NULL, period TEXT NOT NULL, venue TEXT NOT NULL,
   opens_at TEXT NOT NULL, closes_at TEXT NOT NULL, supervisor_email TEXT NOT NULL, supervisor_name TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active', created_at TEXT NOT NULL);
+  status TEXT NOT NULL DEFAULT 'active', created_at TEXT NOT NULL,
+  units TEXT NOT NULL DEFAULT '[]', late_after INTEGER NOT NULL DEFAULT 30, offline INTEGER NOT NULL DEFAULT 0,
+  source TEXT NOT NULL DEFAULT 'timetable', import_id INTEGER);
 CREATE TABLE IF NOT EXISTS session_access(
   id INTEGER PRIMARY KEY, session_id INTEGER NOT NULL REFERENCES exam_sessions(id),
   staff_email TEXT NOT NULL, staff_name TEXT NOT NULL, granted_by TEXT NOT NULL, granted_at TEXT NOT NULL,
@@ -62,5 +71,11 @@ CREATE TRIGGER IF NOT EXISTS hist_no_delete BEFORE DELETE ON signature_history B
 CREATE TRIGGER IF NOT EXISTS doc_no_update BEFORE UPDATE ON documents BEGIN SELECT RAISE(ABORT,'documents are immutable'); END;
 CREATE TRIGGER IF NOT EXISTS doc_no_delete BEFORE DELETE ON documents BEGIN SELECT RAISE(ABORT,'documents are immutable'); END;
 SQL);
+        // Columns added after the first release: upgrade existing databases in place.
+        foreach (['units' => "TEXT NOT NULL DEFAULT '[]'", 'late_after' => 'INTEGER NOT NULL DEFAULT 30', 'offline' => 'INTEGER NOT NULL DEFAULT 0',
+                  'source' => "TEXT NOT NULL DEFAULT 'timetable'", 'import_id' => 'INTEGER'] as $c => $ddl) self::addColumn($db, 'exam_sessions', $c, $ddl);
+        // Feature tables (incidents, flags, seal-key use, director profile, search lockouts, timetable uploads) are created by their owners.
+        Features::migrate($db);
+        Timetable::migrate($db);
     }
 }

@@ -5,25 +5,159 @@
       "email": "supervisor@kcau.ac.ke",
       "name": "Dr. Sample Supervisor",
       "role": "supervisor",
-      "password": "Demo#Super1"
+      "password": "Demo#Super1",
+      "school": "School of Technology",
+      "teaches": []
     },
     {
       "email": "invigilator1@kcau.ac.ke",
       "name": "Invigilator One",
       "role": "invigilator",
-      "password": "Demo#Invig1"
+      "password": "Demo#Invig1",
+      "school": "School of Technology",
+      "teaches": []
     },
     {
       "email": "invigilator2@kcau.ac.ke",
       "name": "Invigilator Two",
       "role": "invigilator",
-      "password": "Demo#Invig2"
+      "password": "Demo#Invig2",
+      "school": "School of Technology",
+      "teaches": []
     },
     {
       "email": "director@kcau.ac.ke",
       "name": "Exam Director",
       "role": "exam_director",
-      "password": "Demo#Direct1"
+      "password": "Demo#Direct1",
+      "school": "Examinations Office",
+      "teaches": []
+    },
+    {
+      "email": "grace.wanjiru@kcau.ac.ke",
+      "name": "Dr. Grace Wanjiru",
+      "role": "supervisor",
+      "password": "Demo#Staff1",
+      "school": "School of Technology",
+      "teaches": [
+        "BSD 4101"
+      ]
+    },
+    {
+      "email": "peter.otieno@kcau.ac.ke",
+      "name": "Mr. Peter Otieno",
+      "role": "supervisor",
+      "password": "Demo#Staff1",
+      "school": "School of Technology",
+      "teaches": [
+        "BIT 3201"
+      ]
+    },
+    {
+      "email": "faith.mutua@kcau.ac.ke",
+      "name": "Ms. Faith Mutua",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Technology",
+      "teaches": [
+        "BSD 4103"
+      ]
+    },
+    {
+      "email": "brian.kiprop@kcau.ac.ke",
+      "name": "Mr. Brian Kiprop",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Technology",
+      "teaches": []
+    },
+    {
+      "email": "anne.njeri@kcau.ac.ke",
+      "name": "Dr. Anne Njeri",
+      "role": "supervisor",
+      "password": "Demo#Staff1",
+      "school": "School of Business",
+      "teaches": [
+        "BBM 3101"
+      ]
+    },
+    {
+      "email": "david.kamau@kcau.ac.ke",
+      "name": "Mr. David Kamau",
+      "role": "supervisor",
+      "password": "Demo#Staff1",
+      "school": "School of Business",
+      "teaches": [
+        "BBM 3102"
+      ]
+    },
+    {
+      "email": "lucy.achieng@kcau.ac.ke",
+      "name": "Ms. Lucy Achieng",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Business",
+      "teaches": []
+    },
+    {
+      "email": "samuel.mwangi@kcau.ac.ke",
+      "name": "Mr. Samuel Mwangi",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Business",
+      "teaches": []
+    },
+    {
+      "email": "joyce.wambui@kcau.ac.ke",
+      "name": "Dr. Joyce Wambui",
+      "role": "supervisor",
+      "password": "Demo#Staff1",
+      "school": "School of Education",
+      "teaches": [
+        "BED 2101"
+      ]
+    },
+    {
+      "email": "kevin.omondi@kcau.ac.ke",
+      "name": "Mr. Kevin Omondi",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Education",
+      "teaches": [
+        "BED 2102"
+      ]
+    },
+    {
+      "email": "mercy.chebet@kcau.ac.ke",
+      "name": "Ms. Mercy Chebet",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Education",
+      "teaches": []
+    },
+    {
+      "email": "isaac.mutiso@kcau.ac.ke",
+      "name": "Mr. Isaac Mutiso",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Technology",
+      "teaches": []
+    },
+    {
+      "email": "hellen.naliaka@kcau.ac.ke",
+      "name": "Ms. Hellen Naliaka",
+      "role": "invigilator",
+      "password": "Demo#Staff1",
+      "school": "School of Business",
+      "teaches": []
+    },
+    {
+      "email": "coordinator@kcau.ac.ke",
+      "name": "Technology Exam Coordinator",
+      "role": "coordinator",
+      "password": "Demo#Coord1",
+      "school": "School of Technology",
+      "teaches": []
     }
   ],
   "units": {
@@ -31,7 +165,11 @@
     "BSD 4102": "Distributed Systems",
     "BSD 4103": "Information Systems Security",
     "BIT 3201": "Database Systems II",
-    "BIT 3202": "Mobile Application Development"
+    "BIT 3202": "Mobile Application Development",
+    "BBM 3101": "Strategic Management",
+    "BBM 3102": "Business Statistics",
+    "BED 2101": "Curriculum Development",
+    "BED 2102": "Educational Psychology"
   },
   "students": [
     {
@@ -79,7 +217,10 @@
       "cleared": false,
       "reason": "Fee balance not cleared",
       "units": [],
-      "phone": "+254700000444"
+      "phone": "+254700000444",
+      "registered": [
+        "BSD 4101"
+      ]
     },
     {
       "adm_no": "22/01005",

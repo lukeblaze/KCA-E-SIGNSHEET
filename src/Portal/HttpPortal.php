@@ -44,6 +44,12 @@ final class HttpPortal implements PortalAdapter
         return $this->call('GET', '/students/' . rawurlencode($admNo) . '/exam-units?period=' . rawurlencode($period)) ?? [];
     }
 
+    // The four methods below are ASSUMED endpoints (see README, "What KCA ICT needs to provide").
+    public function listStaff(): array { return $this->call('GET', '/staff?roles=supervisor,invigilator') ?? []; }
+    public function listUnits(): array { return $this->call('GET', '/units') ?? []; }
+    public function registeredStudents(string $unitCode): array { return $this->call('GET', '/units/' . rawurlencode($unitCode) . '/students') ?? []; }
+    public function studentPhoto(string $admNo): ?string { $r = $this->call('GET', '/students/' . rawurlencode($admNo) . '/photo'); return is_array($r) && isset($r['url']) ? (string)$r['url'] : null; }
+
     private function call(string $method, string $path, ?array $body = null): ?array
     {
         $ch = curl_init($this->base . $path);
