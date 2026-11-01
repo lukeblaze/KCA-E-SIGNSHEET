@@ -1,10 +1,30 @@
 {
   "_note": "DEVELOPMENT DATA ONLY. All people are fictional. Replace with the real portal via PORTAL_DRIVER=http.",
   "staff": [
-    {"email": "supervisor@kcau.ac.ke", "name": "Dr. Sample Supervisor", "role": "supervisor", "password": "Demo#Super1"},
-    {"email": "invigilator1@kcau.ac.ke", "name": "Invigilator One", "role": "invigilator", "password": "Demo#Invig1"},
-    {"email": "invigilator2@kcau.ac.ke", "name": "Invigilator Two", "role": "invigilator", "password": "Demo#Invig2"},
-    {"email": "director@kcau.ac.ke", "name": "Exam Director", "role": "exam_director", "password": "Demo#Direct1"}
+    {
+      "email": "supervisor@kcau.ac.ke",
+      "name": "Dr. Sample Supervisor",
+      "role": "supervisor",
+      "password": "Demo#Super1"
+    },
+    {
+      "email": "invigilator1@kcau.ac.ke",
+      "name": "Invigilator One",
+      "role": "invigilator",
+      "password": "Demo#Invig1"
+    },
+    {
+      "email": "invigilator2@kcau.ac.ke",
+      "name": "Invigilator Two",
+      "role": "invigilator",
+      "password": "Demo#Invig2"
+    },
+    {
+      "email": "director@kcau.ac.ke",
+      "name": "Exam Director",
+      "role": "exam_director",
+      "password": "Demo#Direct1"
+    }
   ],
   "units": {
     "BSD 4101": "Software Engineering Project",
@@ -14,11 +34,76 @@
     "BIT 3202": "Mobile Application Development"
   },
   "students": [
-    {"adm_no": "22/01001", "full_name": "Amina Wanjiru Otieno", "programme": "BSc Software Development", "school_email": "2201001@students.kcau.ac.ke", "cleared": true, "units": ["BSD 4101", "BSD 4102", "BSD 4103"]},
-    {"adm_no": "22/01002", "full_name": "Brian Kiprono Mwangi", "programme": "BSc Software Development", "school_email": "2201002@students.kcau.ac.ke", "cleared": true, "units": ["BSD 4101", "BSD 4103"]},
-    {"adm_no": "22/01003", "full_name": "Cynthia Achieng Odhiambo", "programme": "BSc Information Technology", "school_email": "2201003@students.kcau.ac.ke", "cleared": true, "units": ["BIT 3201", "BIT 3202"]},
-    {"adm_no": "22/01004", "full_name": "David Mutua Kioko", "programme": "BSc Software Development", "school_email": "2201004@students.kcau.ac.ke", "cleared": false, "reason": "Fee balance not cleared", "units": []},
-    {"adm_no": "22/01005", "full_name": "Esther Njeri Kamau", "programme": "BSc Information Technology", "school_email": "2201005@students.kcau.ac.ke", "cleared": true, "units": ["BIT 3201", "BIT 3202", "BSD 4103"]},
-    {"adm_no": "22/01006", "full_name": "Amina Said Hassan", "programme": "BSc Software Development", "school_email": "2201006@students.kcau.ac.ke", "cleared": true, "units": ["BSD 4102", "BSD 4103"]}
+    {
+      "adm_no": "22/01001",
+      "full_name": "Amina Wanjiru Otieno",
+      "programme": "BSc Software Development",
+      "school_email": "2201001@students.kcau.ac.ke",
+      "cleared": true,
+      "units": [
+        "BSD 4101",
+        "BSD 4102",
+        "BSD 4103"
+      ],
+      "phone": "+254712345678"
+    },
+    {
+      "adm_no": "22/01002",
+      "full_name": "Brian Kiprono Mwangi",
+      "programme": "BSc Software Development",
+      "school_email": "2201002@students.kcau.ac.ke",
+      "cleared": true,
+      "units": [
+        "BSD 4101",
+        "BSD 4103"
+      ],
+      "phone": "+254722000111"
+    },
+    {
+      "adm_no": "22/01003",
+      "full_name": "Cynthia Achieng Odhiambo",
+      "programme": "BSc Information Technology",
+      "school_email": "2201003@students.kcau.ac.ke",
+      "cleared": true,
+      "units": [
+        "BIT 3201",
+        "BIT 3202"
+      ],
+      "phone": "+254733000222"
+    },
+    {
+      "adm_no": "22/01004",
+      "full_name": "David Mutua Kioko",
+      "programme": "BSc Software Development",
+      "school_email": "2201004@students.kcau.ac.ke",
+      "cleared": false,
+      "reason": "Fee balance not cleared",
+      "units": [],
+      "phone": "+254700000444"
+    },
+    {
+      "adm_no": "22/01005",
+      "full_name": "Esther Njeri Kamau",
+      "programme": "BSc Information Technology",
+      "school_email": "2201005@students.kcau.ac.ke",
+      "cleared": true,
+      "units": [
+        "BIT 3201",
+        "BIT 3202",
+        "BSD 4103"
+      ],
+      "phone": "+254733000555"
+    },
+    {
+      "adm_no": "22/01006",
+      "full_name": "Amina Said Hassan",
+      "programme": "BSc Software Development",
+      "school_email": "2201006@students.kcau.ac.ke",
+      "cleared": true,
+      "units": [
+        "BSD 4102",
+        "BSD 4103"
+      ]
+    }
   ]
 }

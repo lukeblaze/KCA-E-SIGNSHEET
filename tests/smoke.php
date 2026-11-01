@@ -64,29 +64,34 @@ echo "Clearance and units\n";
 [$c, $j] = $inv->req('GET', "/api/sessions/$sid/students/" . rawurlencode('22/01001') . '/units'); ok(count($j['units']) === 3, 'cleared student sees 3 units');
 
 echo "Signing\n";
-$good = ['adm_no' => '22/01001', 'unit_code' => 'BSD 4101', 'phone' => '0712 345 678', 'booklet_no' => 'BK-004521', 'email' => '2201001@students.kcau.ac.ke', 'signature' => sigPng()];
-[$c, $j] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['email' => 'amina@gmail.com'])); ok($c === 422, 'gmail address rejected');
-[$c, $j] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['email' => '2201002@students.kcau.ac.ke'])); ok($c === 422, "another student's school email rejected");
-[$c, $j] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['email' => '2201001@students.kcau.ac.ke.evil.com'])); ok($c === 422, 'look-alike domain rejected');
+$good = ['adm_no' => '22/01001', 'unit_code' => 'BSD 4101', 'booklet_no' => 'BK-004521', 'signature' => sigPng()];
 [$c] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['signature' => blankPng()])); ok($c === 422, 'blank signature rejected');
-[$c] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['phone' => '123'])); ok($c === 422, 'bad phone rejected');
+[$c] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['booklet_no' => '!'])); ok($c === 422, 'bad booklet number rejected');
 [$c] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['unit_code' => 'BIT 3201'])); ok($c === 422, 'unit the student is not cleared for is rejected');
 [$c] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['adm_no' => '22/01004'])); ok($c === 422, 'uncleared student cannot sign');
+[$c, $j] = $inv->req('GET', "/api/sessions/$sid/students/" . rawurlencode('22/01006') . '/units'); ok($j['prefill']['phone'] === null && $j['prefill']['email'] === '2201006@students.kcau.ac.ke', 'portal prefill returned (email present, phone missing for 22/01006)');
+[$c, $j] = $inv->req('GET', "/api/sessions/$sid/students/" . rawurlencode('22/01001') . '/units'); ok($j['prefill']['phone'] === '+254712345678' && $j['prefill']['phone_from_portal'] === true, 'portal phone prefilled for 22/01001');
 [$c, $j] = $inv->req('POST', "/api/sessions/$sid/signatures", $good); ok($c === 200 && ($j['email']['status'] ?? '') === 'outbox', 'valid signature saved and email copy queued', json_encode($j));
 $code1 = $j['email']['code'] ?? '';
+[$c, $j2] = $inv->req('GET', "/api/sessions/$sid/signatures/" . rawurlencode('22/01001') . '/' . rawurlencode('BSD 4101')); ok($j2['signature']['email'] === '2201001@students.kcau.ac.ke' && $j2['signature']['full_name'] === 'Amina Wanjiru Otieno' && $j2['signature']['phone'] === '+254712345678', 'name, email and phone stored from the portal record');
 $eml = glob("$tmp/outbox/*.eml"); ok(count($eml) === 1, 'email file written'); $mime = $eml ? file_get_contents($eml[0]) : '';
 ok(str_contains($mime, 'To: <2201001@students.kcau.ac.ke>') && str_contains($mime, 'application/pdf'), 'email is addressed to the school email with a PDF attached');
 ok(preg_match('/^KCA-[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/', $code1) === 1, 'receipt has a verification code');
 [$c, $j] = $inv->req('GET', "/api/sessions/$sid/students/" . rawurlencode('22/01001') . '/units'); ok($j['units'][0]['signed'] === true && $j['units'][1]['signed'] === false, 'unit now shows as signed');
 
+[$c] = $inv->req('POST', "/api/sessions/$sid/signatures", ['adm_no' => '22/01002', 'unit_code' => 'BSD 4101', 'booklet_no' => 'BK-77', 'email' => 'attacker@gmail.com', 'full_name' => 'Someone Else', 'phone' => '0799999999', 'signature' => sigPng(3)]);
+$e2 = array_values(array_filter(glob("$tmp/outbox/*.eml"), fn($f) => str_contains((string)file_get_contents($f), '2201002@students')));
+ok($c === 200 && count($e2) === 1 && !str_contains((string)file_get_contents($e2[0]), 'attacker@gmail.com'), 'email typed by the client is ignored; copy goes to the portal email');
+[$c, $j2] = $inv->req('GET', "/api/sessions/$sid/signatures/" . rawurlencode('22/01002') . '/' . rawurlencode('BSD 4101')); ok($j2['signature']['full_name'] === 'Brian Kiprono Mwangi' && $j2['signature']['phone'] === '+254722000111', 'client-sent name and phone are ignored too');
 echo "Correction within the exam period\n";
 [$c, $j] = $inv->req('POST', "/api/sessions/$sid/signatures", array_merge($good, ['booklet_no' => 'BK-004522'])); ok($c === 200 && $j['edited'] === true, 'student corrects their booklet number');
 [$c, $j] = $inv->req('GET', "/api/sessions/$sid/signatures/" . rawurlencode('22/01001') . '/' . rawurlencode('BSD 4101')); ok($j['signature']['version'] === 2 && $j['signature']['booklet_no'] === 'BK-004522', 'record is now version 2');
 [$c, $j] = $inv->req('POST', '/api/verify', ['code' => $code1]); ok($j['valid'] === true && $j['status'] === 'superseded', 'old receipt is authentic but marked superseded');
 
 echo "More signatures and the sheet PDF\n";
-foreach ([['22/01002', '2201002', 'BSD 4101', '0722000111', 'BK-1'], ['22/01005', '2201005', 'BIT 3201', '0733000222', 'BK-2'], ['22/01006', '2201006', 'BSD 4102', '0700000333', 'BK-3']] as [$a, $e, $u, $ph, $bk]) {
-    [$c] = $inv->req('POST', "/api/sessions/$sid/signatures", ['adm_no' => $a, 'unit_code' => $u, 'phone' => $ph, 'booklet_no' => $bk . '23', 'email' => "$e@students.kcau.ac.ke", 'signature' => sigPng(4)]);
+[$c, $j] = $inv->req('POST', "/api/sessions/$sid/signatures", ['adm_no' => '22/01006', 'unit_code' => 'BSD 4102', 'booklet_no' => 'BK-31', 'signature' => sigPng(2)]); ok($c === 422 && ($j['needs_phone'] ?? false), 'missing portal phone asks for one');
+foreach ([['22/01005', '2201005', 'BIT 3201', '0733000222', 'BK-2'], ['22/01006', '2201006', 'BSD 4102', '0700000333', 'BK-3']] as [$a, $e, $u, $ph, $bk]) {
+    [$c] = $inv->req('POST', "/api/sessions/$sid/signatures", ['adm_no' => $a, 'unit_code' => $u, 'phone' => $ph, 'booklet_no' => $bk . '23', 'phone' => $ph, 'signature' => sigPng(4)]);
     ok($c === 200, "signature saved for $a");
 }
 [$c, $pdf, $rawpdf] = $inv->req('GET', "/api/sessions/$sid/sheet/" . rawurlencode('BSD 4101') . '.pdf', null, [], true); ok($c === 200 && str_starts_with($rawpdf, '%PDF-'), 'sealed sheet PDF downloads');

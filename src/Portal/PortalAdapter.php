@@ -17,7 +17,7 @@ interface PortalAdapter
     /** @return list<array{adm_no:string,full_name:string,programme:string}> */
     public function searchStudents(string $query, int $limit = 8): array;
 
-    /** @return array{adm_no:string,full_name:string,programme:string,school_email:string,cleared:bool,reason:?string}|null */
+    /** @return array{adm_no:string,full_name:string,programme:string,school_email:string,phone:?string,cleared:bool,reason:?string}|null */
     public function getStudent(string $admNo): ?array;
 
     /** Units the student is cleared to sit in the given exam period. @return list<array{code:string,name:string}> */

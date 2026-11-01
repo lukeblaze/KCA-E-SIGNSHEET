@@ -317,7 +317,9 @@ final class Api
                 'signed_at' => $r['signed_at'] ?? null, 'version' => $r ? (int)$r['version'] : null, 'email_status' => $r['email_status'] ?? null,
                 'can_edit' => $r ? $this->canEdit($s, $r, $now) : false];
         }
-        $this->json(200, ['student' => $this->pubStudent($stu), 'cleared' => true, 'units' => $out]);
+        $pp = EmailPolicy::phone((string)($stu['phone'] ?? ''));
+        $this->json(200, ['student' => $this->pubStudent($stu), 'cleared' => true, 'units' => $out,
+            'prefill' => ['email' => $stu['school_email'], 'phone' => $pp, 'phone_from_portal' => $pp !== null]]);
     }
 
     private function pubStudent(array $s): array { return ['adm_no' => $s['adm_no'], 'full_name' => $s['full_name'], 'programme' => $s['programme']]; }
@@ -366,12 +368,16 @@ final class Api
         foreach ($this->portal->clearedUnits($stu['adm_no'], $s['period']) as $u) if ($u['code'] === $unitCode) $unit = $u;
         if (!$unit) throw new HttpError(422, 'The student is not cleared to sit that unit this semester.');
 
-        $phone = EmailPolicy::phone($this->str($b, 'phone', 30));
-        if (!$phone) throw new HttpError(422, 'Enter a valid Kenyan phone number, e.g. 0712 345 678.');
+        // Name, admission number, email and phone come from the portal record only. Anything the client sends for them is ignored.
+        $phone = EmailPolicy::phone((string)($stu['phone'] ?? ''));
+        if (!$phone) {
+            $phone = EmailPolicy::phone($this->str($b, 'phone', 30));
+            if (!$phone) throw new HttpError(422, 'The portal has no phone number for this student. Enter a valid Kenyan phone number, e.g. 0712 345 678.', ['needs_phone' => true]);
+        }
         $booklet = strtoupper($this->str($b, 'booklet_no', 30));
         if (!preg_match('/^[A-Z0-9][A-Z0-9\-\/ ]{2,19}$/', $booklet)) throw new HttpError(422, 'Enter the booklet serial number exactly as printed (3-20 letters/digits).');
-        $em = EmailPolicy::check($this->str($b, 'email', 254), $stu['school_email']);
-        if (!$em['ok']) throw new HttpError(422, 'That email cannot receive the sign sheet copy. Use your own KCA school email.', ['checks' => $em['checks']]);
+        $em = EmailPolicy::check($stu['school_email'], $stu['school_email']);
+        if (!$em['ok']) throw new HttpError(422, 'The school email on this student\'s portal record is not an allowed KCA address. Ask the exam director to correct the portal record.', ['checks' => $em['checks']]);
         $png = $this->decodeSignature((string)($b['signature'] ?? ''));
 
         $now = Util::now();

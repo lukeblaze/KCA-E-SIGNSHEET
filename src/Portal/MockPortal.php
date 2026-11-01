@@ -48,7 +48,7 @@ final class MockPortal implements PortalAdapter
             if (Util::normAdm($s['adm_no']) === Util::normAdm($admNo)) {
                 return [
                     'adm_no' => $s['adm_no'], 'full_name' => $s['full_name'], 'programme' => $s['programme'],
-                    'school_email' => strtolower($s['school_email']), 'cleared' => (bool)$s['cleared'], 'reason' => $s['reason'] ?? null,
+                    'school_email' => strtolower($s['school_email']), 'phone' => $s['phone'] ?? null, 'cleared' => (bool)$s['cleared'], 'reason' => $s['reason'] ?? null,
                 ];
             }
         }

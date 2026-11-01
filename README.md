@@ -9,7 +9,7 @@ Plain PHP 8.1+ (tested on 8.3) with SQLite. **No Composer packages**, so it drop
 ```bash
 php bin/setup.php --demo          # creates .env, database, signing key, and an open demo exam session
 php -S 0.0.0.0:8080 -t public public/router.php
-php tests/smoke.php               # 53 end-to-end API checks (uses a throwaway database)
+php tests/smoke.php               # 55 end-to-end API checks (uses a throwaway database)
 ```
 
 Open http://localhost:8080. Dev demo accounts (mock portal only, refused when `APP_ENV=prod`) are in `data/mock_portal.json`.
@@ -18,8 +18,8 @@ Open http://localhost:8080. Dev demo accounts (mock portal only, refused when `A
 
 1. **Chief supervisor** signs in with a portal staff account, loads the exam session (period, venue, open/close time) on the school device, and can grant other invigilators' accounts access until the session closes (revocable).
 2. **Invigilator** hands the device to the student. The student types a name or admission number and taps their name. The portal returns whether they are cleared and which units they may sit this semester.
-3. The student taps a unit and fills: phone, booklet serial number, school email, signature. Full name and admission number come from the portal and cannot be edited.
-4. **Save & send email copy** is blocked unless the email (a) is well formed, (b) is on an allowed KCA domain (exact match), (c) matches the email on the student's portal record, and optionally (d) the domain has MX records.
+3. The student taps a unit. Name, admission number, school email and phone are pre-filled from the portal and locked (the server ignores anything the form sends for them). The student only types the **booklet serial number** and signs. If the portal has no phone on file, that one field is typed.
+4. **Save & send email copy** is blocked unless the portal email is on an allowed KCA domain (exact match) and, optionally, the domain has MX records.
 5. The sealed PDF is built, emailed, and the device returns to the sign sheet home.
 6. **Corrections:** the student can reopen the unit until the session closes (a new version; the old one is kept and its receipt is marked "superseded"). After that, only the **exam director** can reopen a form for a limited time.
 

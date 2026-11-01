@@ -261,10 +261,10 @@
     const err = h('div', { class: 'err', hidden: true, role: 'alert' });
     const name = h('input', { type: 'text', id: 'fn', readonly: true, value: ur.student.full_name });
     const admIn = h('input', { type: 'text', id: 'fa', readonly: true, value: ur.student.adm_no });
-    const phone = h('input', { type: 'tel', id: 'fp', autocomplete: 'off', inputmode: 'tel', placeholder: '0712 345 678', value: old ? old.phone : '' });
+    const pf = ur.prefill || {};
+    const phone = h('input', { type: 'tel', id: 'fp', autocomplete: 'off', inputmode: 'tel', placeholder: '0712 345 678', readonly: !!pf.phone_from_portal, value: pf.phone || (old ? old.phone : '') });
     const book = h('input', { type: 'text', id: 'fb', autocomplete: 'off', autocapitalize: 'characters', placeholder: 'As printed on the booklet', maxlength: 20, value: old ? old.booklet_no : '' });
-    const email = h('input', { type: 'email', id: 'fe', autocomplete: 'off', inputmode: 'email', autocapitalize: 'off', placeholder: 'your school email', value: old ? old.email : '' });
-    const checks = h('ul', { class: 'checks', 'aria-live': 'polite' });
+    const email = h('input', { type: 'email', id: 'fe', readonly: true, value: pf.email || '' });
     const sure = h('input', { type: 'checkbox', id: 'fc', style: 'width:22px;height:22px;flex:none' });
     const save = h('button', { class: 'btn gold', style: 'min-height:50px', onclick: submit }, 'Save & send email copy');
 
@@ -282,17 +282,7 @@
     if (old) { const img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); inked = true; hint.hidden = true; }; img.src = old.signature; }
     const clear = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); inked = false; hint.hidden = false; };
 
-    async function runChecks() {
-      if (!email.value.trim()) { checks.replaceChildren(); return null; }
-      try {
-        const r = await api('POST', `/sessions/${s.id}/validate-email`, { adm_no: ur.student.adm_no, email: email.value });
-        checks.replaceChildren(...r.checks.map(c => h('li', {}, h('span', { class: 'dot ' + (c.passed ? 'p' : 'f'), 'aria-hidden': 'true' }, c.passed ? '✓' : '✕'), h('span', {}, c.label, h('span', { class: 'sr' }, c.passed ? ' passed' : ' failed')))));
-        return r.ok;
-      } catch { return null; }
-    }
-    email.addEventListener('input', () => { clearTimeout(emailTimer); emailTimer = setTimeout(runChecks, 350); resetIdle(); });
     for (const el of [phone, book, sure]) el.addEventListener('input', resetIdle);
-    if (old) runChecks();
 
     async function submit() {
       err.hidden = true;
@@ -300,13 +290,12 @@
       if (!sure.checked) return fail('Tick the box to confirm you are present for this exam.');
       save.disabled = true; save.textContent = 'Saving...';
       try {
-        const r = await api('POST', `/sessions/${s.id}/signatures`, { adm_no: ur.student.adm_no, unit_code: unitCode, phone: phone.value, booklet_no: book.value, email: email.value, signature: canvas.toDataURL('image/png') });
+        const r = await api('POST', `/sessions/${s.id}/signatures`, { adm_no: ur.student.adm_no, unit_code: unitCode, phone: phone.value, booklet_no: book.value, signature: canvas.toDataURL('image/png') });
         clearTimeout(idleTimer);
         const st = r.email.status;
         toast(st === 'failed' ? 'Saved, but the email copy could not be sent. Use "Resend email" on the unit.' : st === 'outbox' ? 'Saved. Email copy queued (development outbox).' : 'Saved. A PDF copy was sent to ' + r.email.to, st === 'failed');
         go('#/sheet');
       } catch (e) {
-        if (e.data && e.data.checks) runChecks();
         fail(e.message + (e.data && e.data.needs_reopen ? ' Go back and tap "Ask exam director to reopen".' : ''));
         save.disabled = false; save.textContent = 'Save & send email copy';
       }
@@ -319,14 +308,14 @@
       h('div', { class: 'grid' },
         h('div', { class: 'card' }, err,
           h('div', { class: 'cols' }, h('div', { class: 'field' }, h('label', { for: 'fn' }, 'Full name (from portal)'), name), h('div', { class: 'field' }, h('label', { for: 'fa' }, 'Admission number (from portal)'), admIn)),
-          h('div', { class: 'cols' }, h('div', { class: 'field' }, h('label', { for: 'fp' }, 'Phone number'), phone), h('div', { class: 'field' }, h('label', { for: 'fb' }, 'Booklet serial number'), book)),
-          h('div', { class: 'field' }, h('label', { for: 'fe' }, 'School email'), email, checks),
+          h('div', { class: 'cols' }, h('div', { class: 'field' }, h('label', { for: 'fp' }, pf.phone_from_portal ? 'Phone number (from portal)' : 'Phone number (not on portal, type it)'), phone), h('div', { class: 'field' }, h('label', { for: 'fe' }, 'School email (from portal)'), email)),
+          h('div', { class: 'field' }, h('label', { for: 'fb' }, 'Booklet serial number'), book, h('div', { class: 'm', style: 'margin-top:4px' }, 'Copy it exactly as printed on your answer booklet.')),
           h('div', { class: 'field' }, h('label', {}, 'Signature'), h('div', { class: 'sigwrap' }, canvas, hint), h('button', { class: 'btn sm', style: 'margin-top:8px', type: 'button', onclick: clear }, 'Clear signature')),
           h('div', { class: 'field', style: 'display:flex;gap:10px;align-items:flex-start' }, sure, h('label', { for: 'fc', style: 'font-weight:400;margin:0' }, 'I confirm I am present for this exam and the details above are mine.')),
           h('div', { class: 'acts' }, save, h('button', { class: 'btn', style: 'min-height:50px', onclick: () => { clearTimeout(idleTimer); go('#/student/' + encodeURIComponent(adm)); } }, 'Cancel'))),
-        h('div', {}, h('div', { class: 'card' }, h('h2', {}, 'Before you save'), h('p', { class: 'm' }, 'Use your own KCA school email. Copies sent to any other address are blocked, so your record cannot be lost or leaked.')),
+        h('div', {}, h('div', { class: 'card' }, h('h2', {}, 'Before you save'), h('p', { class: 'm' }, 'Your name, admission number, phone and school email come straight from the university portal, so they cannot be mistyped. You only enter the booklet serial number and sign. Your copy goes to your school email.')),
           h('div', { class: 'card gold' }, h('p', { class: 'm' }, 'After you save, the screen returns to the sign sheet and a sealed PDF copy is emailed to you. Keep it.'))))));
-    phone.focus();
+    (phone.readOnly ? book : phone).focus();
   }
 
   // -------------------------------------------------------------- director
