@@ -1,5 +1,7 @@
 # KCA University Exam e-Sign Sheet
 
+> **Status: concept prototype, not an official KCA University product.** Built by Blaze Murimi Nyamu (final-year BSc Software Development, KCA University) to show how paper exam sign sheets could be replaced. It runs against a **mock portal with fictional students and staff**; no real student data is in this repository. The KCA name and logo are used only to illustrate the intended look and belong to KCA University.
+
 Students sign for each exam unit on a school-issued phone or tablet. The system pulls the student's cleared units from the KCA portal, validates their school email, and emails each student a **sealed PDF copy**, so the school is no longer the only holder of the record. Supervisors download a sealed per-unit sign sheet PDF.
 
 Plain PHP 8.1+ (tested on 8.3) with SQLite. **No Composer packages**, so it drops into KCA's PHP environment. Needs extensions: `pdo_sqlite`, `gd`, `mbstring`, `openssl`, `curl`.
