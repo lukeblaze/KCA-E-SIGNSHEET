@@ -6,6 +6,10 @@ Students sign for each exam unit on a school-issued phone or tablet. The system 
 
 Plain PHP 8.1+ (tested on 8.3) with SQLite. **No Composer packages**, so it drops into KCA's PHP environment. Needs extensions: `pdo_sqlite`, `gd`, `mbstring`, `openssl`, `curl`.
 
+## See it in 35 seconds
+
+[Walkthrough video (MP4, about 9 MB)](docs/KCA-e-Sign-Sheet-walkthrough.mp4): staff sign-in, timetable upload and approval, student lookup, signing, the sealed PDF receipt and verification. Fictional data only.
+
 ## Run it (development)
 
 ```bash
